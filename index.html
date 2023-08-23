@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>WebSocket Interface</title>
+</head>
+
+<body>
+	<h1>WebSocket Interface</h1>
+
+	<textarea id="requestInput" rows="10" cols="50">
+
+    </textarea>
+	<button id="sendButton">Send Request</button>
+
+	<h2>Generated Links:</h2>
+	<div id="linksContainer"></div>
+
+	<script>
+		const sendButton = document.getElementById("sendButton");
+		const requestInput = document.getElementById("requestInput");
+		const linksContainer = document.getElementById("linksContainer");
+		let hostTokenCount = 1;
+		const ws = new WebSocket("ws://127.0.0.1:3001");
+
+		ws.addEventListener("message", async (event) => {
+				console.log(event)
+				const response = JSON.parse(event.data);
+
+				if (Array.isArray(response)) {
+					const rooms = response;
+
+					for (const room of rooms) {
+						const link = document.createElement("a");
+						link.href = `ws://0.0.0.0:5555/room/${room.id}?token=HOST_TOKEN${hostTokenCount}`;
+						link.textContent = link.href;
+						link.target = "_blank";
+						linksContainer.appendChild(link);
+
+						hostTokenCount++;
+					}
+				}
+
+				// ws.close();
+			});
+
+
+		sendButton.addEventListener("click", async () => {
+			const request = JSON.parse(requestInput.value);
+			ws.send(JSON.stringify(request));
+
+
+			
+		});
+
+
+	</script>
+</body>
+
+</html>
